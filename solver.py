@@ -1,10 +1,13 @@
 # solver.py
 
 def solve(bo):
-    find = find_empty(bo)
-    if not find:
+    find = FindEmptyPro(bo)  # we might be trying to solve an invalide board like one with 2 same num in same row etc so
+    # i modify the this part and added findEmptyPro so it return false(2) for invalide one (0) if no empty and (i,j) for empty square
+    if find==0:
         return True
-    else:
+    elif find==2:
+        return False
+    else:    
         row, col = find
 
     for i in range(1,10):
@@ -56,11 +59,41 @@ def print_board(bo):
             else:
                 print(str(bo[i][j]) + " ", end="")
 
+def FindEmptyPro(bo):
+    emp = None
+    for i in range(9):
+        rowseen = set()
+        colseen = set()
+        sqseen = set()
+        
+        for j in range(9):
+            # Find the first empty cell
+            if bo[i][j] == 0 and not emp:
+                emp = (i, j)
 
-def find_empty(bo):
-    for i in range(len(bo)):
-        for j in range(len(bo[0])):
-            if bo[i][j] == 0:
-                return (i, j)  # row, col
+            # Check for duplicates in row
+            if bo[i][j] != 0:
+                if bo[i][j] in rowseen:
+                    return 2
+                rowseen.add(bo[i][j])
 
-    return None
+            # Check for duplicates in column
+            if bo[j][i] != 0:
+                if bo[j][i] in colseen:
+                    return 2
+                colseen.add(bo[j][i])
+
+            # Check for duplicates in 3x3 square
+            rowIndex = 3 * (i // 3)
+            colIndex = 3 * (i % 3)
+            r = rowIndex + j // 3
+            c = colIndex + j % 3
+            if bo[r][c] != 0:
+                if bo[r][c] in sqseen:
+                    return 2
+                sqseen.add(bo[r][c])
+
+     # Return the first empty cell found, or None if board is full and valid
+    if emp is None:
+        return 0
+    return emp
